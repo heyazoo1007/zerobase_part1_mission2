@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Setter
 @Getter
 @Entity
@@ -17,6 +19,14 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String accountNums;
+    private String accountNumber;
+
+    private AccountStatus accountStatus;
+
+    private Long balance;
+
+    private LocalDateTime registeredAt;
+
+    private LocalDateTime unRegisteredAt;
 
 }
