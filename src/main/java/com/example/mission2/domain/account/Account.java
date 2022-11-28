@@ -1,10 +1,8 @@
-package com.example.mission2.domain;
+package com.example.mission2.domain.account;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.mission2.domain.user.User;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,8 +17,13 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
+
     private String accountNumber;
 
+    @Enumerated(value = EnumType.STRING)
     private AccountStatus accountStatus;
 
     private Long balance;
