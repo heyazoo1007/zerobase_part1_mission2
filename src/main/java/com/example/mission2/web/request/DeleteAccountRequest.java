@@ -1,11 +1,9 @@
 package com.example.mission2.web.request;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
-public class CreateAccountRequest {
+public class DeleteAccountRequest {
     private Long userId;
-    private Long initialBalance;
+    private String accountNumber;
 }

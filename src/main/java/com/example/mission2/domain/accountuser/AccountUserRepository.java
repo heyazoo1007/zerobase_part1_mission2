@@ -1,6 +1,6 @@
-package com.example.mission2.domain.user;
+package com.example.mission2.domain.accountuser;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface AccountUserRepository extends JpaRepository<AccountUser, Long> {
 }
