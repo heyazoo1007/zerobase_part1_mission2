@@ -1,4 +1,4 @@
-package com.example.mission2.service;
+package com.example.mission2.service.account;
 
 import com.example.mission2.domain.account.Account;
 import com.example.mission2.domain.account.AccountRepository;
@@ -11,6 +11,7 @@ import com.example.mission2.web.request.DeleteAccountRequest;
 import com.example.mission2.web.response.CreateAccountResponse;
 import com.example.mission2.web.response.DeleteAccountResponse;
 import com.example.mission2.web.response.GetAccountListResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AccountUserRepository accountUserRepository;
 
+    @Transactional
     public CreateAccountResponse createAccount(CreateAccountRequest createAccountRequest) {
         Long userId = createAccountRequest.getUserId();
         Long initialBalance = createAccountRequest.getInitialBalance();
@@ -43,6 +45,7 @@ public class AccountService {
         return CreateAccountResponse.of(created);
     }
 
+    @Transactional
     public DeleteAccountResponse deleteAccount(DeleteAccountRequest deleteAccountRequest) {
         Long userId = deleteAccountRequest.getUserId();
         String accountNumber = deleteAccountRequest.getAccountNumber();
@@ -62,6 +65,7 @@ public class AccountService {
         return DeleteAccountResponse.of(account);
     }
 
+    @Transactional
     public List<GetAccountListResponse> getAccountList(Long userId) {
         AccountUser accountUser = getAccountUser(userId);
 

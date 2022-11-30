@@ -1,6 +1,6 @@
 package com.example.mission2.web.controller;
 
-import com.example.mission2.service.AccountService;
+import com.example.mission2.service.account.AccountService;
 import com.example.mission2.web.request.CreateAccountRequest;
 import com.example.mission2.web.request.DeleteAccountRequest;
 import com.example.mission2.web.response.CreateAccountResponse;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController

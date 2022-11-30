@@ -2,7 +2,9 @@ package com.example.mission2.domain.account;
 
 
 import com.example.mission2.domain.accountuser.AccountUser;
+import com.example.mission2.exception.Mission2Exception;
 import com.example.mission2.type.AccountStatus;
+import com.example.mission2.type.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -10,6 +12,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+
+import static com.example.mission2.type.ErrorCode.AMOUNT_EXCEED_BALANCE;
 
 
 @Getter
@@ -56,5 +60,12 @@ public class Account {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
+    }
+
+    public void useBalance(Long amount) {
+        if (amount > balance) {
+            throw new Mission2Exception(AMOUNT_EXCEED_BALANCE);
+        }
+        balance -= amount;
     }
 }
