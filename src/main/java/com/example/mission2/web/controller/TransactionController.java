@@ -1,11 +1,13 @@
 package com.example.mission2.web.controller;
 
 import com.example.mission2.service.transaction.TransactionService;
-import com.example.mission2.web.request.UseTransactionRequest;
-import com.example.mission2.web.response.UseTransactionResponse;
+import com.example.mission2.web.request.CancelBalanceRequest;
+import com.example.mission2.web.request.UseBalanceRequest;
+import com.example.mission2.web.response.CancelBalanceResponse;
+import com.example.mission2.web.response.QueryTransactionResponse;
+import com.example.mission2.web.response.UseBalanceResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,20 +17,20 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @PostMapping("/use")
-    public ResponseEntity<UseTransactionResponse> useTransaction(
-            @RequestBody @Valid UseTransactionRequest request) {
-        return ResponseEntity
-                .status(200)
-                .body(transactionService.useTransaction(request));
+    public UseBalanceResponse useTransaction(
+            @RequestBody @Valid UseBalanceRequest request) {
+        return transactionService.useBalance(request);
     }
 
     @PostMapping("/cancel")
-    public void cancelTransaction() {
-
+    public CancelBalanceResponse cancelTransaction(
+            @RequestBody @Valid CancelBalanceRequest request) {
+        return transactionService.cancelBalance(request);
     }
 
     @GetMapping("/{transactionId}")
-    public void getTransaction(@PathVariable Long transactionId) {
-
+    public QueryTransactionResponse getTransaction(
+            @PathVariable String transactionId) {
+        return transactionService.queryTransaction(transactionId);
     }
 }
