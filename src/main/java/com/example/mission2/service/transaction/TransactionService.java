@@ -8,8 +8,12 @@ import com.example.mission2.domain.transaction.Transaction;
 import com.example.mission2.domain.transaction.TransactionRepository;
 import com.example.mission2.exception.Mission2Exception;
 import com.example.mission2.type.AccountStatus;
-import com.example.mission2.web.request.UseTransactionRequest;
-import com.example.mission2.web.response.UseTransactionResponse;
+import com.example.mission2.type.TransactionType;
+import com.example.mission2.web.request.CancelBalanceRequest;
+import com.example.mission2.web.request.UseBalanceRequest;
+import com.example.mission2.web.response.CancelBalanceResponse;
+import com.example.mission2.web.response.QueryTransactionResponse;
+import com.example.mission2.web.response.UseBalanceResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +34,7 @@ public class TransactionService {
     private final AccountUserRepository accountUserRepository;
 
     @Transactional
-    public UseTransactionResponse useTransaction(UseTransactionRequest request) {
+    public UseBalanceResponse useBalance(UseBalanceRequest request) {
         Long userId = request.getUserId();
         String accountNumber = request.getAccountNumber();
         Long amount = request.getAmount();
@@ -43,7 +47,7 @@ public class TransactionService {
 
         account.useBalance(amount);
 
-        return UseTransactionResponse.of(transactionRepository.save(Transaction.builder()
+        return UseBalanceResponse.of(transactionRepository.save(Transaction.builder()
                 .account(account)
                 .transactionType(USE)
                 .transactionResultType(SUCCESS)
@@ -52,6 +56,39 @@ public class TransactionService {
                 .transactionId(UUID.randomUUID().toString().replace("-", ""))
                 .transactedAt(LocalDateTime.now())
                 .build()));
+    }
+
+    public CancelBalanceResponse cancelBalance(CancelBalanceRequest request) {
+        String transactionId = request.getTransactionId();
+        String accountNumber = request.getAccountNumber();
+        Long amount = request.getAmount();
+
+        Account account = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new Mission2Exception(ACCOUNT_NOT_FOUND));
+
+        Transaction transaction =
+                transactionRepository.findByTransactionId(transactionId)
+                .orElseThrow(() -> new Mission2Exception(TRANSACTION_NOT_FOUND));
+
+        validateCancelTransaction(amount, account, transaction);
+
+        account.cancelBalance(amount);
+
+        // 취소된 거래를 새로 만들어서 추가하는 이유는?
+        return CancelBalanceResponse.of(transactionRepository.save(Transaction.builder()
+                .account(account)
+                .transactionType(TransactionType.CANCEL)
+                .transactionResultType(SUCCESS)
+                .amount(amount)
+                .balanceSnapshot(account.getBalance())
+                .transactionId(UUID.randomUUID().toString().replace("-",""))
+                .transactedAt(LocalDateTime.now())
+                .build()));
+    }
+
+    public QueryTransactionResponse queryTransaction(String transactionId) {
+        return QueryTransactionResponse.of(transactionRepository.findByTransactionId(transactionId)
+                .orElseThrow(() -> new Mission2Exception(TRANSACTION_NOT_FOUND)));
     }
 
     private Account getAccount(String accountNumber) {
@@ -64,7 +101,6 @@ public class TransactionService {
                 .orElseThrow(() -> new Mission2Exception(USER_NOT_FOUND));
     }
 
-    @Transactional
     private static void validateUseBalance(Long amount, AccountUser accountUser, Account account) {
         if (!Objects.equals(accountUser.getId(), account.getAccountUser().getId())) {
             throw new Mission2Exception(USER_ACCOUNT_UN_MATCH);
@@ -74,6 +110,18 @@ public class TransactionService {
         }
         if (account.getBalance() < amount) {
             throw new Mission2Exception(AMOUNT_EXCEED_BALANCE);
+        }
+    }
+
+    private static void validateCancelTransaction(Long amount, Account account, Transaction transaction) {
+        if (!Objects.equals(account.getId(), transaction.getAccount().getId())) {
+            throw new Mission2Exception(ACCOUNT_TRANSACTION_UN_MATCH);
+        }
+        if (amount != transaction.getAmount()) {
+            throw new Mission2Exception(CANCEL_MUST_FULLY);
+        }
+        if (transaction.getTransactedAt().isBefore(LocalDateTime.now().minusYears(1))) {
+            throw new Mission2Exception(TOO_OLD_ORDER_TO_CANCEL);
         }
     }
 }
