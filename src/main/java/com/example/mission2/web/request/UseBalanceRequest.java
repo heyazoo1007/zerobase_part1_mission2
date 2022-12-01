@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UseTransactionRequest {
+public class UseBalanceRequest {
     private Long userId;
     private String accountNumber;
     private Long amount;
